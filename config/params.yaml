@@ -1,0 +1,53 @@
+# Serenity 三闸门 · 冻结参数
+# 规则:本文件是全系统唯一的参数来源。任何修改必须:
+#   1) 独立git commit,message注明理由;
+#   2) 附带 backtest/ 下的回归结果(误杀/放行案例);
+#   3) 盘后进行,次日生效。
+# runner.py 会记录本文件的sha256,盘中被改动会在合规自检中暴露。
+
+universe:
+  boards_allowed: ["60", "00", "300"]     # 主板+创业板
+  boards_excluded: ["68", "8", "4"]       # 科创板/北交所
+  exclude_st: true
+  min_listed_days: 120
+  min_avg_amount_20d: 200000000           # 2亿
+  min_market_cap: 5000000000              # 50亿
+
+stage1:
+  max_dist_ma20_pct: 8.0                  # 现价距MA20上限
+  gain_60d_min_pct: 0.0
+  gain_60d_max_pct: 35.0
+  crash_lookback_days: 3
+  crash_daily_drop_pct: 6.0               # 近3日单日跌幅≥6%熔断
+  candidate_target_max: 80
+
+stage2:
+  breakout_lookback_days: 20
+  platform_min_days: 30
+  breakout_vol_ratio: 1.8                 # 突破日量 ≥ 20日均量1.8倍
+  pullback_vol_max_ratio: 0.5             # 回踩量 ≤ 突破量50%
+  platform_pierce_tolerance_pct: 3.0      # 回踩容忍瞬间击穿3%
+  min_criteria_hit: 3                     # 4项判据至少命中3,且②必要
+  adx_start_min: 20.0
+  adx_start_max: 35.0
+  gmma_spread_min_pct: 2.0
+  gmma_spread_max_pct: 6.0
+  list_b_max: 20
+
+stage3:
+  max_risk_pct: 8.0                       # 闸门1:风险%>8%无条件淘汰
+  borderline_band_pct: 0.9                # 读数落在阈值90%~100%区间=压线
+  borderline_penalty: 3                   # 每项压线扣3分
+  borderline_downgrade_count: 2           # ≥2项压线降级观察
+  score_pass: 70
+  risk_budget_pct: 1.0                    # 单笔风险=账户1%
+  position_cap_pct: 25.0
+
+calendar_gate:
+  mega_ipo_threshold: 10000000000         # 募资>100亿
+  window_before_subscribe_days: 5         # 申购日T-5
+  window_after_payment_days: 2            # 缴款日T+2
+
+discipline:
+  max_screen_rounds: 2                    # 扩池熔断
+  max_web_searches_per_stock: 2           # 闸门3每只≤2次检索
